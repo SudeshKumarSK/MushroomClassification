@@ -40,5 +40,18 @@ def StatisticalEncoding(dataFrame, categoricalFeatures, numericalFeatures):
     return temp_df_final
 
 
-def FrequencyEncoding():
-    pass
+def OneHotEncoding(dataFrame, categoricalFeatures, numericalFeatures):
+    temp_df = dataFrame[::]
+
+    X_train_temp = temp_df.drop('class', axis=1)  # Select all the features except labels,
+    y_train_temp = temp_df['class']  # Select only the 'class' column.
+
+    for cat_feature in categoricalFeatures:
+        X_train_temp_enc = pd.get_dummies(X_train_temp[cat_feature], prefix=cat_feature)
+        X_train_temp = pd.concat([X_train_temp, X_train_temp_enc], axis=1)
+        X_train_temp.drop(cat_feature, axis=1, inplace=True)
+
+    temp_df_final = pd.concat([X_train_temp, y_train_temp], axis=1)
+
+    return temp_df_final
+        

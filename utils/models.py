@@ -11,6 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import pickle
+import shutil
 
 
 from sklearn.model_selection import KFold
@@ -454,9 +455,22 @@ class Model():
         train_acc = 0.0
         train_cer = 0.0
 
+        ## Baseline Model
+        if model_name == "baseline":
+            clf = NearestCentroid()
+
+            curr_model = clf.fit(X_train, y_train)
+
+            # Performing the same steps for the validation fold.
+            Y_pred = clf.predict(X_train)
+            
+            train_acc = accuracy_score(Y_pred, y_train)
+
+            train_cer = 1 - train_acc
+        
         ## Non-Probablistic Models {Perceptron and KNN}
 
-        if model_name == "perceptron":
+        elif model_name == "perceptron":
 
             clf = Perceptron(tol=1e-3, random_state=0)
 
@@ -526,10 +540,27 @@ class Model():
 
 
         # Save the model using pickle
-        with open(f"../models/{model_name}.pkl", "wb") as model_file:
+        with open(f"{model_name}.pkl", "wb") as model_file:
             pickle.dump(curr_model, model_file)
 
+        # Save the model using pickle
+        with open(f"{model_name}_backup.pkl", "wb") as model_file:
+            pickle.dump(curr_model, model_file)
 
-        return (train_acc, train_cer)
+        # Specify the current file path
+        current_file_path = f"./{model_name}.pkl"
+        # Specify the destination folder path
+        destination_folder_path = f"/Users/sk/ee559-mlOne/MushroomClassification/saved_models/{model_name}.pkl"
+        # Move the file to the destination folder
+        shutil.move(current_file_path, destination_folder_path)
+
+        # Specify the current file path
+        current_file_path = f"./{model_name}_backup.pkl"
+        # Specify the destination folder path
+        destination_folder_path = f"./models_backup/{model_name}.pkl"
+        # Move the file to the destination folder
+        shutil.move(current_file_path, destination_folder_path)
+
+        return (train_acc * 100, train_cer * 100)
     
             

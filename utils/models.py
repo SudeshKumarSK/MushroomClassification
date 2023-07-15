@@ -24,7 +24,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.svm import SVC
 
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from sklearn.utils import shuffle
 
 
@@ -564,3 +564,25 @@ class Model():
         return (train_acc * 100, train_cer * 100)
     
             
+
+    def performTest(self, X_test, y_test, model):
+
+        # Performing the same steps for the validation fold.
+        y_pred = model.predict(X_test)
+    
+        test_acc = accuracy_score(y_pred, y_test)
+
+        test_cer = 1 - test_acc
+
+        # Calculate F1 score
+        f1 = f1_score(y_test, y_pred)
+
+        # Calculate precision
+        precision = precision_score(y_test, y_pred)
+
+        # Calculate recall
+        recall = recall_score(y_test, y_pred)
+
+        return (test_acc*100, test_cer*100, precision, recall, f1)
+    
+
